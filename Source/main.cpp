@@ -142,7 +142,7 @@ int CALLBACK WinMain ( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 			{
 				WideWhat = L"Exception occurred: Failure to convert its message text using MultiByteToWideChar: convertResult=";
 				// WideWhat += ConvertResult.ToString()->Data();
-				// WideWhat += L"  GetLastError()=";
+				WideWhat += L"  GetLastError()=";
 				// WideWhat += GetLastError().ToString()->Data();
 			}
 			else

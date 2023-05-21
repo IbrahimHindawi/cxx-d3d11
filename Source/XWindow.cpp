@@ -2,15 +2,13 @@
 #include "XWindow.h"
 #include <sstream>
 
-#define chwnd_except(hr) XWindow::XWindowException(__LINE__, __FILE__, hr)
-
 /*
 * Window
 */
 
 XWindow::XWindow(int Width, int Height, const LPCWSTR Name)
 {
-	// throw chwnd_except(ERROR_ARENA_TRASHED);
+	// throw XWndExcept(ERROR_ARENA_TRASHED);
 	// throw std::runtime_error("Error!");
 	// throw 666;
 	// calculate window size based on desired client region size
@@ -19,9 +17,18 @@ XWindow::XWindow(int Width, int Height, const LPCWSTR Name)
 	wr.right = Width + wr.left;
 	wr.top = 100;
 	wr.bottom = Height + wr.top;
-	AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
+	
+	if (FAILED(AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE)))
+	{
+		throw XWindowLastExcept();
+	}
 	// create window and get hwnd
-	hWnd = CreateWindowEx(0, XWindowClass::GetName(), Name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr, XWindowClass::GetInstance(), this);
+	// hWnd = CreateWindowEx(0, XWindowClass::GetName(), Name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr, XWindowClass::GetInstance(), this);
+	hWnd = CreateWindowEx(0, L"XWindowClass::GetName()", Name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr, XWindowClass::GetInstance(), this);
+	if (hWnd == nullptr)
+	{
+		throw XWindowLastExcept();
+	}
 	// show window
 	ShowWindow(hWnd, SW_SHOW);
 };
@@ -155,4 +162,28 @@ HRESULT XWindow::XWindowException::GetErrorCode() const noexcept
 std::string XWindow::XWindowException::GetErrorString() const noexcept
 {
 	return TranslateErrorCode(hr);
+}
+
+std::wstring ToWide(const std::string& narrow)
+{
+	std::wstring wide;
+	wide.resize(narrow.size() + 1);
+	size_t actual;
+	mbstowcs_s(&actual, wide.data(), wide.size(), narrow.c_str(), _TRUNCATE);
+	if (actual > 0)
+	{
+		wide.resize(actual - 1);
+		return wide;
+	}
+	return {};
+}
+
+std::string ToNarrow(const std::wstring& wide)
+{
+	std::string narrow;
+	narrow.resize(wide.size() * 2);
+	size_t actual;
+	wcstombs_s(&actual, narrow.data(), narrow.size(), wide.c_str(), _TRUNCATE);
+	narrow.resize(actual - 1);
+	return narrow;
 }

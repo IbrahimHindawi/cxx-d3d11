@@ -2,6 +2,9 @@
 #include "common.h"
 #include "XExceptionBase.h"
 
+#define XWindowExcept(hr) XWindow::XWindowException(__LINE__, __FILE__, hr)
+#define XWindowLastExcept() XWindow::XWindowException(__LINE__, __FILE__, GetLastError())
+
 /* 
 * XWindow: Class handles window messages, creation & destruction of hWnd.
 */
@@ -11,6 +14,10 @@ private:
 	HWND hWnd = 0;
 	int Width = 0;
 	int Height = 0;
+	/*
+	 * These functions cannot handle exceptions because they are C based. 
+	 * You'd have to create an exception marshaling system.
+	 */
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -22,6 +29,8 @@ public:
 private:
 	/* 
 	* XWindowClass: Singleton design pattern that manages registration and cleanup of WNDCLASSEX.
+	* NOTE: you could create the singleton through a function and try catch errors because currently
+	* this class gets constructed outside the try catch block in main upon execution startup.
 	*/
 	class XWindowClass 
 	{

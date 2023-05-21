@@ -21,6 +21,9 @@
     <ClCompile Include="Source\XWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\XExceptionBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\common.h">
@@ -29,5 +32,13 @@
     <ClInclude Include="Source\XWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\XExceptionBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include="LICENSE" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>
