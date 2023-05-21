@@ -1,45 +1,18 @@
+#pragma once
 #include "XWindow.h"
+#include <sstream>
 
-/*
-* WindowClass
-*/
-
-XWindow::XWindowClass XWindow::XWindowClass::SingletonWindowClass;
-
-XWindow::XWindowClass::XWindowClass() noexcept : Instance(GetModuleHandle(nullptr)) {
-	WNDCLASSEX WindowClass = { 0 };
-	WindowClass.cbSize = sizeof(WindowClass);
-	WindowClass.style = CS_OWNDC;
-	WindowClass.lpfnWndProc = HandleMsgSetup;
-	WindowClass.cbClsExtra = 0;
-	WindowClass.cbWndExtra = 0;
-	WindowClass.hInstance = GetInstance();
-	WindowClass.hIcon = nullptr;
-	WindowClass.hCursor = nullptr;
-	WindowClass.hbrBackground = nullptr;
-	WindowClass.lpszMenuName = nullptr;
-	WindowClass.lpszClassName = GetName();
-	WindowClass.hIconSm = nullptr;
-	RegisterClassEx(&WindowClass);
-}
-
-XWindow::XWindowClass::~XWindowClass() noexcept {
-	UnregisterClass(XWindowClass::GetName(), XWindowClass::GetInstance());
-}
-
-const LPCWSTR XWindow::XWindowClass::GetName() noexcept {
-	return ClassName;
-}
-
-HINSTANCE XWindow::XWindowClass::GetInstance() noexcept {
-	return SingletonWindowClass.Instance;
-}
+#define chwnd_except(hr) XWindow::XWindowException(__LINE__, __FILE__, hr)
 
 /*
 * Window
 */
 
-XWindow::XWindow(int Width, int Height, const LPCWSTR Name) noexcept {
+XWindow::XWindow(int Width, int Height, const LPCWSTR Name)
+{
+	// throw chwnd_except(ERROR_ARENA_TRASHED);
+	// throw std::runtime_error("Error!");
+	// throw 666;
 	// calculate window size based on desired client region size
 	RECT wr;
 	wr.left = 100;
@@ -53,11 +26,13 @@ XWindow::XWindow(int Width, int Height, const LPCWSTR Name) noexcept {
 	ShowWindow(hWnd, SW_SHOW);
 };
 
-XWindow::~XWindow() {
+XWindow::~XWindow() 
+{
 	DestroyWindow(hWnd);
 }
 
-LRESULT CALLBACK XWindow::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept {
+LRESULT CALLBACK XWindow::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept 
+{
 	if (msg == WM_NCCREATE)
 	{
 		// extract ptr to window class from creation data
@@ -75,23 +50,109 @@ LRESULT CALLBACK XWindow::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPA
 
 }
 
-LRESULT XWindow::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept {
+LRESULT XWindow::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept 
+{
 	switch (msg)
 	{
-		case WM_CLOSE: {
+		case WM_CLOSE: 
+		{
 			PostQuitMessage(666);
 			return 0;
 		}
-		default: {
+		default: 
+		{
 			break;
 		}
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-LRESULT CALLBACK XWindow::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept {
+LRESULT CALLBACK XWindow::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept 
+{
 	XWindow* const pWnd = reinterpret_cast<XWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	return pWnd->HandleMsg(hWnd, msg, wParam, lParam);
 }
 
+/*
+* WindowClass
+*/
 
+XWindow::XWindowClass XWindow::XWindowClass::SingletonWindowClass;
+
+XWindow::XWindowClass::XWindowClass() noexcept : Instance(GetModuleHandle(nullptr)) 
+{
+	WNDCLASSEX WindowClass = { 0 };
+	WindowClass.cbSize = sizeof(WindowClass);
+	WindowClass.style = CS_OWNDC;
+	WindowClass.lpfnWndProc = HandleMsgSetup;
+	WindowClass.cbClsExtra = 0;
+	WindowClass.cbWndExtra = 0;
+	WindowClass.hInstance = GetInstance();
+	WindowClass.hIcon = nullptr;
+	WindowClass.hCursor = nullptr;
+	WindowClass.hbrBackground = nullptr;
+	WindowClass.lpszMenuName = nullptr;
+	WindowClass.lpszClassName = GetName();
+	WindowClass.hIconSm = nullptr;
+	RegisterClassEx(&WindowClass);
+}
+
+XWindow::XWindowClass::~XWindowClass() noexcept 
+{
+	UnregisterClass(XWindowClass::GetName(), XWindowClass::GetInstance());
+}
+
+const LPCWSTR XWindow::XWindowClass::GetName() noexcept 
+{
+	return ClassName;
+}
+
+HINSTANCE XWindow::XWindowClass::GetInstance() noexcept 
+{
+	return SingletonWindowClass.Instance;
+}
+
+/*
+* XException
+*/
+
+XWindow::XWindowException::XWindowException(int Line, const char* File, HRESULT hr): XExceptionBase(Line, File), hr(hr)
+{
+
+}
+
+const char* XWindow::XWindowException::what() const noexcept
+{
+	std::ostringstream outstringstream;
+	outstringstream << GetType() << std::endl << "[Error Code]" << GetErrorCode() << std::endl << "[Description]" << GetErrorString() << std::endl << GetOriginString();
+	WhatBuffer = outstringstream.str();
+	return WhatBuffer.c_str();
+}
+
+const char* XWindow::XWindowException::GetType() const noexcept
+{
+	return "XWindow XException";
+}
+
+std::string XWindow::XWindowException::TranslateErrorCode(HRESULT hr) noexcept
+{
+	char* pMsgBuff = nullptr;
+	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&pMsgBuff), 0, nullptr);
+	if (nMsgLen == 0)
+	{
+		return "Undefined Error Code";
+	}
+	std::string ErrorString = pMsgBuff;
+	LocalFree(pMsgBuff);
+	return ErrorString;
+}
+
+HRESULT XWindow::XWindowException::GetErrorCode() const noexcept
+{
+	return hr;
+}
+
+std::string XWindow::XWindowException::GetErrorString() const noexcept
+{
+	return TranslateErrorCode(hr);
+}
