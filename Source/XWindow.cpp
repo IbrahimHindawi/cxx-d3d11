@@ -1,6 +1,7 @@
 #pragma once
 #include "XWindow.h"
 #include <sstream>
+#include "resource.h"
 
 /*
 * Window
@@ -23,8 +24,8 @@ XWindow::XWindow(int Width, int Height, const LPCWSTR Name)
 		throw XWindowLastExcept();
 	}
 	// create window and get hwnd
-	// hWnd = CreateWindowEx(0, XWindowClass::GetName(), Name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr, XWindowClass::GetInstance(), this);
-	hWnd = CreateWindowEx(0, L"XWindowClass::GetName()", Name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr, XWindowClass::GetInstance(), this);
+	hWnd = CreateWindowEx(0, XWindowClass::GetName(), Name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr, XWindowClass::GetInstance(), this);
+	// hWnd = CreateWindowEx(0, L"XWindowClass::GetName()", Name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr, XWindowClass::GetInstance(), this);
 	if (hWnd == nullptr)
 	{
 		throw XWindowLastExcept();
@@ -95,12 +96,12 @@ XWindow::XWindowClass::XWindowClass() noexcept : Instance(GetModuleHandle(nullpt
 	WindowClass.cbClsExtra = 0;
 	WindowClass.cbWndExtra = 0;
 	WindowClass.hInstance = GetInstance();
-	WindowClass.hIcon = nullptr;
+	WindowClass.hIcon = static_cast<HICON>(LoadImage(Instance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0));
 	WindowClass.hCursor = nullptr;
 	WindowClass.hbrBackground = nullptr;
 	WindowClass.lpszMenuName = nullptr;
 	WindowClass.lpszClassName = GetName();
-	WindowClass.hIconSm = nullptr;
+	WindowClass.hIconSm = static_cast<HICON>(LoadImage(Instance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));
 	RegisterClassEx(&WindowClass);
 }
 
