@@ -139,13 +139,17 @@
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\XExceptionBase.cpp" />
+    <ClCompile Include="Source\XStringProcs.cpp" />
     <ClCompile Include="Source\XWindow.cpp" />
+    <ClCompile Include="XKeyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\resource.h" />
     <ClInclude Include="Source\common.h" />
     <ClInclude Include="Source\XExceptionBase.h" />
+    <ClInclude Include="Source\XStringProcs.h" />
     <ClInclude Include="Source\XWindow.h" />
+    <ClInclude Include="XKeyboard.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

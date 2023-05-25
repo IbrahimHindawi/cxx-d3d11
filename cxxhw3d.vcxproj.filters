@@ -24,6 +24,12 @@
     <ClCompile Include="Source\XExceptionBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XKeyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\XStringProcs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\common.h">
@@ -36,6 +42,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XKeyboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\XStringProcs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

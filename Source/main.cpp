@@ -1,9 +1,13 @@
+#include "common.h"
+
 #include <codecvt>
 #include <string.h>
-#include "common.h"
+#include <stringapiset.h>
+
 #include "XWindow.h"
 #include "XExceptionBase.h"
-#include <stringapiset.h>
+#include "XStringProcs.h"
+
 /*
 LPCWSTR Char2WChar(const char* InputString)
 {

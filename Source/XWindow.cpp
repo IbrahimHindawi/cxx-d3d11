@@ -1,5 +1,6 @@
 #pragma once
 #include "XWindow.h"
+#include "XStringProcs.h"
 #include <sstream>
 #include "resource.h"
 
@@ -9,7 +10,7 @@
 
 XWindow::XWindow(int Width, int Height, const LPCWSTR Name)
 {
-	// throw XWndExcept(ERROR_ARENA_TRASHED);
+	// throw XWindowExcept(ERROR_ARENA_TRASHED);
 	// throw std::runtime_error("Error!");
 	// throw 666;
 	// calculate window size based on desired client region size
@@ -144,14 +145,13 @@ const char* XWindow::XWindowException::GetType() const noexcept
 
 std::string XWindow::XWindowException::TranslateErrorCode(HRESULT hr) noexcept
 {
-	char* pMsgBuff = nullptr;
-	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&pMsgBuff), 0, nullptr);
+	LPWSTR pMsgBuff = nullptr;
+	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), LPWSTR(&pMsgBuff), 0, nullptr);
 	if (nMsgLen == 0)
 	{
 		return "Undefined Error Code";
 	}
-	std::string ErrorString = pMsgBuff;
-	LocalFree(pMsgBuff);
+	std::string ErrorString = ToNarrow(pMsgBuff);
 	return ErrorString;
 }
 
@@ -165,26 +165,3 @@ std::string XWindow::XWindowException::GetErrorString() const noexcept
 	return TranslateErrorCode(hr);
 }
 
-std::wstring ToWide(const std::string& narrow)
-{
-	std::wstring wide;
-	wide.resize(narrow.size() + 1);
-	size_t actual;
-	mbstowcs_s(&actual, wide.data(), wide.size(), narrow.c_str(), _TRUNCATE);
-	if (actual > 0)
-	{
-		wide.resize(actual - 1);
-		return wide;
-	}
-	return {};
-}
-
-std::string ToNarrow(const std::wstring& wide)
-{
-	std::string narrow;
-	narrow.resize(wide.size() * 2);
-	size_t actual;
-	wcstombs_s(&actual, narrow.data(), narrow.size(), wide.c_str(), _TRUNCATE);
-	narrow.resize(actual - 1);
-	return narrow;
-}
