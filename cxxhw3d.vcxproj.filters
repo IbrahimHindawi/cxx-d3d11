@@ -24,7 +24,7 @@
     <ClCompile Include="Source\XExceptionBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XKeyboard.cpp">
+    <ClCompile Include="Source\XKeyboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\XStringProcs.cpp">
@@ -44,7 +44,7 @@
     <ClInclude Include="Source\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XKeyboard.h">
+    <ClInclude Include="Source\XKeyboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\XStringProcs.h">
