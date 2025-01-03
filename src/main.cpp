@@ -243,7 +243,8 @@ void initDX() {
 void initShaders() {
     HRESULT hr;
     D3D11_INPUT_ELEMENT_DESC layout[] = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
     u32 numelements = sizeofarray(layout);
     // ID3DBlob *vsBlob = nullptr;
@@ -263,16 +264,14 @@ void initShaders() {
 
 struct Vertex {
     f32 x; f32 y; f32 z;
-	/*   DirectX::XMFLOAT2 pos;*/
-	/*Vertex() {}*/
-	/*Vertex(float x, float y) : pos(x, y) {}*/
+    f32 r; f32 g; f32 b;
 };
 
 void initScene() {
     Vertex verts[] = {
-        {.5f, -.5f, 0.f},
-        {-.5f, -.5f, 0.f},
-        {0.f, .5f, 0.f},
+        {.5f, -.5f, 0.f, 1.f, 0.f, 0.f},
+        {-.5f, -.5f, 0.f, 0.f, 1.f, 0.f},
+        {0.f, .5f, 0.f, 0.f, 0.f, 1.f},
     };
     D3D11_BUFFER_DESC vertexbufferdesc = {};
     vertexbufferdesc.Usage = D3D11_USAGE_DEFAULT;
@@ -292,7 +291,7 @@ void initScene() {
 }
 
 void RenderFrame() {
-    f32 bgcolor[] = {0.f, 0.f, 1.f, 1.f};
+    f32 bgcolor[] = {.1f, .1f, .1f, 1.f};
     bool vsync = true;
     devicecontext->ClearRenderTargetView(rendertargetview.Get(), bgcolor);
     //
